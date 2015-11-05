@@ -1,0 +1,18 @@
+<html>
+
+<head>
+	<title>Route 1.0.0</title>
+	<script src="../node_modules/systemjs/dist/system.src.js"></script>
+	<script src="../node_modules/angular2/bundles/angular2.dev.js"></script>
+	<!--<link rel="stylesheet" type="text/css" href="reset.css"> -->
+</head>
+
+<body>
+	<script>
+		System.config({ packages: { 'components': { defaultExtension: 'js' } } });
+		System.import('components/inventory/inventory.component');
+	</script>
+	<inventory>Loading...</inventory>
+</body>
+
+</html>
