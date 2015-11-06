@@ -1,2 +1,3 @@
-<p><span>{{item.description}}</span> <span *ng-for="#count of item.counts"> {{count.count}}</span></p>
-<!--<p [ng-class]="index % 2 === 1 ? 'oddHighlight' : ''" ><span>{{item.description}}</span> <span *ng-for="#count of item.counts"> {{count.count}}</span></p>-->
+<tr>
+	<td>{{item.description}}</td><td *ng-for="#count of item.counts"> {{count.count}}</td>
+</tr>

@@ -1,5 +1,13 @@
 <h1>Verticordia</h1>
 
-<div class="stripes">
-	<inventoryitem *ng-for="#item of inventory; #index = index" [item]="item" [index]="index" [hidden]="item.keys[0].key=='b'"></inventoryitem>
-</div>
+<table>
+	<thead>
+		<tr>
+			<th>Description</th>
+			<th *ng-for="#count of inventory[0].counts">{{count.size}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<inventoryitem *ng-for="#item of inventory; #index = index" [item]="item" [index]="index" [hidden]="item.keys[0].key=='b'"></inventoryitem>
+	</tbody>
+</table>

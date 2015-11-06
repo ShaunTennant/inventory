@@ -30,4 +30,5 @@ export class Inventory {
 	}
 }
 
+
 bootstrap(Inventory);
