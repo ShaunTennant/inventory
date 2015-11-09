@@ -6,7 +6,7 @@ import { InventoryItem } from './inventoryitem.class'
 	templateUrl: './components/inventoryitem/inventoryitem.html',
 	styleUrls: ['./components/inventoryitem/inventoryitem.css'],
 	directives: [NgFor, NgClass],
-	inputs: ['junk']
+	inputs: ['inventory']
 })
 export class InventoryItemComponent {
 }
