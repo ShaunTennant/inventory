@@ -1,7 +1,7 @@
 import { bootstrap, Component, View, NgFor, Pipe, PipeTransform } from 'angular2/angular2';
 
 import { InventoryTableComponent } from '../inventorytable/inventorytable.component'
-import { InventoryItem, Key } from '../inventoryshared/inventorytable.class'
+import { Inventory, InventoryItem, Key } from '../inventoryshared/inventorytable.class'
 import { InventoryService } from '../inventoryshared/inventory.service'
 
 @Pipe({
@@ -16,18 +16,18 @@ class FirstLetterPipe implements PipeTransform {
 }
 
 @Component({
-	selector: 'inventory',
+	selector: 'inventoryroot',
 	templateUrl: './components/inventory/inventory.html',
 	styleUrls: ['./components/inventory/inventory.css'],
 	directives: [InventoryTableComponent, NgFor],
 	pipes: [FirstLetterPipe]
 })
-export class Inventory {
-	private inventory: InventoryItem[];
-	
+export class InventoryRoot {
+	private inventory: Inventory;
+
 	constructor() {
 		this.inventory = InventoryService.getInventory();
 	}
 }
 
-bootstrap(Inventory);
+bootstrap(InventoryRoot);

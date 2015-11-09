@@ -2,11 +2,12 @@
 	<thead>
 		<tr>
 			<th>Description</th>
-			<th *ng-for="#count of inventory[0].counts">{{count.size}}</th>
+			<th *ng-for="#count of inventory.items[0].counts">{{count.size}}</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr *ng-for="#item of inventory;" [hidden]="item.description.charAt(0) == 'b'">
+		<tr *ng-for="#item of inventory.items; #index = index" [hidden]="inventory.hiddens[index]">
+		<tr *ng-for="#item of inventory.items">
 			<td>{{item.description}}</td>
 			<td *ng-for="#count of item.counts">{{count.count}}</td>
 		</tr>

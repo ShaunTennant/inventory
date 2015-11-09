@@ -1,8 +1,13 @@
-import { InventoryItem } from '../inventoryshared/inventorytable.class'
+import { Inventory, InventoryItem } from '../inventoryshared/inventorytable.class'
 
 export class InventoryService {
-	static getInventory(): InventoryItem[] {
-		return [
+	// static inventory: Inventory;
+	static items: InventoryItem[];
+	static matches: boolean[] = [];
+	static hiddens: boolean[] = [];
+
+	static getInventory() {
+		this.items = [
 			{ description: "acerosa", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
 			{ description: "acerosa var. acerosa", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
 			{ description: "acerosa var. preissii", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
@@ -173,5 +178,12 @@ export class InventoryService {
 			{ description: "vicinella", keys: [{ key: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
 			{ description: "wonganensis", keys: [{ key: "w", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] }
 		];
+
+		for (var i: number = 0; i < this.items.length; i++) {
+			this.matches.push(true);
+			this.hiddens.push(false);
+		};
+
+		return new Inventory(this.items, this.matches, this.hiddens)
 	}
 }
