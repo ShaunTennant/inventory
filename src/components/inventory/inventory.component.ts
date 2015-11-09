@@ -23,12 +23,11 @@ class FirstLetterPipe implements PipeTransform {
 	pipes: [FirstLetterPipe]
 })
 export class Inventory {
-	inventory: InventoryItem[];
-
+	private inventory: InventoryItem[];
+	
 	constructor() {
 		this.inventory = InventoryService.getInventory();
 	}
 }
-
 
 bootstrap(Inventory);
