@@ -1,4 +1,4 @@
-import { InventoryItem } from '../inventoryitem/inventoryitem.class'
+import { InventoryItem } from '../inventoryshared/inventorytable.class'
 
 export class InventoryService {
 	static getInventory(): InventoryItem[] {
