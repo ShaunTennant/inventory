@@ -214,8 +214,8 @@ export class InventoryService {
             this._inventory.greys.push(i % 2 == 0);
         };
 
-        // this.filters = ['s', 'a', 'f'];
-        this.filters = [];
+        this.filters = ['s', 'a', 'f'];
+        // this.filters = [];
 
         return this._inventory;
     }
