@@ -1,14 +1,43 @@
-import { Inventory, InventoryItem } from '../inventoryshared/inventorytable.class'
+import { Inventory } from '../inventoryshared/inventorytable.class'
 
 export class InventoryService {
-    // static inventory: Inventory;
+    private static _inventory: Inventory = new Inventory();
+    private static _filters: string[] = [];
 
-    static getInventory() {
-        var items: InventoryItem[];
-        var matches: boolean[] = [];
-        var greys: boolean[] = [];
-		
-        items = [
+    static get filters(): string[] {
+        return this._filters;
+    }
+
+    static set filters(filters: string[]) {
+        this._filters = filters;
+        this.filter()
+    }
+
+    private static filter(): void {
+        for (var i: number = 0; i < this._inventory.items.length; i++) {
+            this._inventory.matches[i] = false;
+            for (var j: number = 0; j < this._inventory.items[i].keys.length; j++) {
+                if (this._filters.length == 0) {
+                    this._inventory.matches[i] = true;
+                } else {
+                    for (var k: number = 0; k < this._filters.length; k++) {
+                        this._inventory.matches[i] = this._inventory.matches[i] || (this._inventory.items[i].keys[j].key == this._filters[k]);
+                    }
+                }
+            }
+        }
+
+        var grey: boolean = true;
+        for (var i: number = 0; i < this._inventory.items.length; i++) {
+            if (this._inventory.matches[i]) {
+                this._inventory.greys[i] = grey;
+                grey = !grey;
+            }
+        }
+    }
+
+    public static getInventory() {
+        this._inventory.items = [
             { description: "acerosa", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "acerosa var. acerosa", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "acerosa var. preissii", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
@@ -179,19 +208,15 @@ export class InventoryService {
             { description: "vicinella", keys: [{ key: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "wonganensis", keys: [{ key: "w", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] }
         ];
-		
-        var grey: boolean = true;
-        for (var i: number = 0; i < items.length; i++) {
-            matches.push(items[i].description.charAt(0) != 'b');
-            if (matches[i]) {
-                greys.push(grey);
-                grey = !grey;
-            }
-            else {
-                greys.push(false);
-            }
+
+        for (var i: number = 0; i < this._inventory.items.length; i++) {
+            this._inventory.matches.push(true);
+            this._inventory.greys.push(i % 2 == 0);
         };
 
-        return new Inventory(items, matches, greys)
+        // this.filters = ['s', 'a', 'f'];
+        this.filters = [];
+
+        return this._inventory;
     }
 }
