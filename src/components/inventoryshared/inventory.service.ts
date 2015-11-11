@@ -1,8 +1,9 @@
-import { Inventory } from '../inventoryshared/inventorytable.class'
+import { Inventory, Key } from '../inventoryshared/inventorytable.class'
 
 export class InventoryService {
     private static _inventory: Inventory = new Inventory();
-    private static _filters: string[] = [];
+    private static _filters: string[];
+    private static _uniqueKeys: Key[];
 
     static get filters(): string[] {
         return this._filters;
@@ -17,11 +18,11 @@ export class InventoryService {
         for (var i: number = 0; i < this._inventory.items.length; i++) {
             this._inventory.matches[i] = false;
             for (var j: number = 0; j < this._inventory.items[i].keys.length; j++) {
-                if (this._filters.length == 0) {
+                if (this._filters.length === 0) {
                     this._inventory.matches[i] = true;
                 } else {
                     for (var k: number = 0; k < this._filters.length; k++) {
-                        this._inventory.matches[i] = this._inventory.matches[i] || (this._inventory.items[i].keys[j].key == this._filters[k]);
+                        this._inventory.matches[i] = this._inventory.matches[i] || (this._inventory.items[i].keys[j].key === this._filters[k]);
                     }
                 }
             }
@@ -36,8 +37,64 @@ export class InventoryService {
         }
     }
 
-    public static getInventory() {
+    public static collateKeys() {
+        var duplicateFound: boolean;
+        this._uniqueKeys = [];
+        for (var i: number = 0; i < this._inventory.items.length; i++) {
+            for (var j: number = 0; j < this._inventory.items[i].keys.length; j++) {
+                duplicateFound = false;
+                for (var k: number = 0; k < this._uniqueKeys.length; k++) {
+                    duplicateFound = this._uniqueKeys[k].key === this._inventory.items[i].keys[j].key && this._uniqueKeys[k].rank === this._inventory.items[i].keys[j].rank;
+                    if (duplicateFound) {
+                        break;
+                    }
+                }
+
+                if (!duplicateFound) {
+                    this._uniqueKeys.push(this._inventory.items[i].keys[j]);
+                }
+            }
+        }
+        // this._uniqueKeys.forEach(function(value: Key) {
+        //     console.log(value.key + ',' + value.rank);
+        // });
+
+        this._uniqueKeys.sort(function(a: Key, b: Key) {
+            if (a.rank < b.rank) {
+                return -1;
+            }
+            if (a.rank > b.rank) {
+                return 1;
+            }
+            if (typeof a.key === typeof b.key) {
+                if (a.key < b.key) {
+                    return -1;
+                }
+                if (a.key > b.key) {
+                    return 1;
+                }
+                return 0;
+            }
+            if (typeof a.key === 'string') {
+                return -1;
+            }
+            return 1;
+        });
+        // console.log('================================');
+        // this._uniqueKeys.forEach(function(value: Key) {
+        //     console.log(value.key + ',' + value.rank);
+        // });
+    }
+
+    public static getInventory(): Inventory {
         this._inventory.items = [
+            { description: "bifimbriata", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "blepharophylla", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brachypoda", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brevifolia", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brevifolia subsp. brevifolia", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brevifolia subsp. stirlingensis", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brownii", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "acerosa", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "acerosa var. acerosa", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "acerosa var. preissii", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
@@ -49,13 +106,6 @@ export class InventoryService {
             { description: "attenuata", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "aurea", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "auriculata", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "bifimbriata", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "blepharophylla", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brachypoda", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brevifolia", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brevifolia subsp. brevifolia", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brevifolia subsp. stirlingensis", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brownii", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "capillaris", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "carinata", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "centipeda", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
@@ -211,11 +261,13 @@ export class InventoryService {
 
         for (var i: number = 0; i < this._inventory.items.length; i++) {
             this._inventory.matches.push(true);
-            this._inventory.greys.push(i % 2 == 0);
+            this._inventory.greys.push(i % 2 === 0);
         };
 
         this.filters = ['s', 'a', 'f'];
         // this.filters = [];
+        
+        this.collateKeys();
 
         return this._inventory;
     }

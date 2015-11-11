@@ -5,13 +5,13 @@ export class Inventory {
 }
 
 export class InventoryItem {
-	description: string;
+	description: string | number;
 	keys: Key[];
 	counts: Count[];
 }
 
 export class Key {
-	key: string;
+	key: string | number;
 	rank: number;
 }
 export class Count {
