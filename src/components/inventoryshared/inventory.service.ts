@@ -1,65 +1,56 @@
 import { Inventory, Key } from '../inventoryshared/inventorytable.class'
 
 export class InventoryService {
-    private static _inventory: Inventory = new Inventory();
-    private static _filters: string[];
-    private static _uniqueKeys: Key[];
-
-    static get filters(): string[] {
-        return this._filters;
-    }
-
-    static set filters(filters: string[]) {
-        this._filters = filters;
-        this.filter()
-    }
+    public static inventory: Inventory = new Inventory();
+    public static selectedKeys: Key[];
+    public static uniqueKeys: Key[];
 
     private static filter(): void {
-        for (var i: number = 0; i < this._inventory.items.length; i++) {
-            this._inventory.matches[i] = false;
-            for (var j: number = 0; j < this._inventory.items[i].keys.length; j++) {
-                if (this._filters.length === 0) {
-                    this._inventory.matches[i] = true;
+        for (var i: number = 0; i < this.inventory.items.length; i++) {
+            this.inventory.matches[i] = false;
+            for (var j: number = 0; j < this.inventory.items[i].keys.length; j++) {
+                if (this.selectedKeys.length === 0) {
+                    this.inventory.matches[i] = true;
                 } else {
-                    for (var k: number = 0; k < this._filters.length; k++) {
-                        this._inventory.matches[i] = this._inventory.matches[i] || (this._inventory.items[i].keys[j].key === this._filters[k]);
+                    for (var k: number = 0; k < this.selectedKeys.length; k++) {
+                        this.inventory.matches[i] = this.inventory.matches[i] || ((this.inventory.items[i].keys[j].key === this.selectedKeys[k].key) && (this.inventory.items[i].keys[j].rank === this.selectedKeys[k].rank));
+                        if (this.inventory.matches[i]) {
+                            break;
+                        }
                     }
                 }
             }
         }
 
         var grey: boolean = true;
-        for (var i: number = 0; i < this._inventory.items.length; i++) {
-            if (this._inventory.matches[i]) {
-                this._inventory.greys[i] = grey;
+        for (var i: number = 0; i < this.inventory.items.length; i++) {
+            if (this.inventory.matches[i]) {
+                this.inventory.greys[i] = grey;
                 grey = !grey;
             }
         }
     }
 
-    public static collateKeys() {
+    public static uniqueKeysCalculate() {
         var duplicateFound: boolean;
-        this._uniqueKeys = [];
-        for (var i: number = 0; i < this._inventory.items.length; i++) {
-            for (var j: number = 0; j < this._inventory.items[i].keys.length; j++) {
+        this.uniqueKeys = [];
+        for (var i: number = 0; i < this.inventory.items.length; i++) {
+            for (var j: number = 0; j < this.inventory.items[i].keys.length; j++) {
                 duplicateFound = false;
-                for (var k: number = 0; k < this._uniqueKeys.length; k++) {
-                    duplicateFound = this._uniqueKeys[k].key === this._inventory.items[i].keys[j].key && this._uniqueKeys[k].rank === this._inventory.items[i].keys[j].rank;
+                for (var k: number = 0; k < this.uniqueKeys.length; k++) {
+                    duplicateFound = this.uniqueKeys[k].key === this.inventory.items[i].keys[j].key && this.uniqueKeys[k].rank === this.inventory.items[i].keys[j].rank;
                     if (duplicateFound) {
                         break;
                     }
                 }
 
                 if (!duplicateFound) {
-                    this._uniqueKeys.push(this._inventory.items[i].keys[j]);
+                    this.uniqueKeys.push(this.inventory.items[i].keys[j]);
                 }
             }
         }
-        // this._uniqueKeys.forEach(function(value: Key) {
-        //     console.log(value.key + ',' + value.rank);
-        // });
 
-        this._uniqueKeys.sort(function(a: Key, b: Key) {
+        this.uniqueKeys.sort(function(a: Key, b: Key) {
             if (a.rank < b.rank) {
                 return -1;
             }
@@ -81,13 +72,13 @@ export class InventoryService {
             return 1;
         });
         // console.log('================================');
-        // this._uniqueKeys.forEach(function(value: Key) {
+        // this.uniqueKeys.forEach(function(value: Key) {
         //     console.log(value.key + ',' + value.rank);
         // });
     }
 
-    public static getInventory(): Inventory {
-        this._inventory.items = [
+    public static inventoryOpen(): Inventory {
+        this.inventory.items = [
             { description: "bifimbriata", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "blepharophylla", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "brachypoda", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
@@ -150,9 +141,9 @@ export class InventoryService {
             { description: "fimbrilepis subsp. fimbrilepis", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "forrestii", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "fragrans", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "galeata", keys: [{ key: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "gracilis", keys: [{ key: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "grandiflora", keys: [{ key: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "galeata", keys: [{ key: "g", rank: 1 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "gracilis", keys: [{ key: "g", rank: 1 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "grandiflora", keys: [{ key: "g", rank: 1 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "grandis", keys: [{ key: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "habrantha", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
             { description: "halophila", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
@@ -259,16 +250,15 @@ export class InventoryService {
             { description: "wonganensis", keys: [{ key: "w", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] }
         ];
 
-        for (var i: number = 0; i < this._inventory.items.length; i++) {
-            this._inventory.matches.push(true);
-            this._inventory.greys.push(i % 2 === 0);
+        for (var i: number = 0; i < this.inventory.items.length; i++) {
+            this.inventory.matches.push(true);
+            this.inventory.greys.push(i % 2 === 0);
         };
 
-        this.filters = ['s', 'a', 'f'];
-        // this.filters = [];
-        
-        this.collateKeys();
+        this.uniqueKeysCalculate();
+        this.selectedKeys = [{ key: "s", rank: 0 }, { key: "a", rank: 1 }, { key: "f", rank: 0 } ]
+        this.filter()
 
-        return this._inventory;
+        return this.inventory;
     }
 }
