@@ -2,13 +2,13 @@
 	<thead>
 		<tr>
 			<th>Description</th>
-			<th *ng-for="#count of inventory.items[0].counts">{{count.size}}</th>
+			<th *ng-for="#amount of inventory.items[0].amounts">{{amount.size}}</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr *ng-for="#item of inventory.items; #index = index" [hidden]="!inventory.matches[index]" [ng-class]="{ grey: inventory.greys[index] }">
 			<td>{{item.description}}</td>
-			<td *ng-for="#count of item.counts">{{count.count}}</td>
+			<td *ng-for="#amount of item.amounts">{{amount.value}}</td>
 		</tr>
 	</tbody>
 </table>

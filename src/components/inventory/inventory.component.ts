@@ -1,6 +1,5 @@
 import { bootstrap, Component, View, NgFor, Pipe, PipeTransform } from 'angular2/angular2';
-
-import { Inventory, InventoryItem, Filter, Count } from '../inventoryshared/inventorytable.class'
+import { Inventory, InventoryItem, Filter, Amount } from '../inventoryshared/inventorytable.class'
 import { InventoryService } from '../inventoryshared/inventory.service'
 import { InventoryTableComponent } from '../inventorytable/inventorytable.component'
 

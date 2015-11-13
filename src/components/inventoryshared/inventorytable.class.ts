@@ -7,14 +7,14 @@ export class Inventory {
 export class InventoryItem {
 	description: string | number;
 	filters: Filter[];
-	counts: Count[];
+	amounts: Amount[];
 }
 
 export class Filter {
-	filter: string | number;
+	value: string | number;
 	rank: number;
 }
-export class Count {
+export class Amount {
 	size: string;
-	count: number;
+	value: number;
 }
