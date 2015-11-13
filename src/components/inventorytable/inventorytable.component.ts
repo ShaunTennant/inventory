@@ -1,5 +1,5 @@
 import { Component, View, NgFor, NgClass } from 'angular2/angular2';
-import { InventoryItem } from '../inventoryshared/inventorytable.class'
+import { Inventory, InventoryItem, Filter, Count } from '../inventoryshared/inventorytable.class'
 
 @Component({
 	selector: 'inventorytable',

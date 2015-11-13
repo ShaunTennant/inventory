@@ -1,37 +1,28 @@
-import { Inventory, Key } from '../inventoryshared/inventorytable.class'
+import { Inventory, InventoryItem, Filter, Count } from '../inventoryshared/inventorytable.class'
 
 export class InventoryService {
-    private static _inventory: Inventory = new Inventory();
-    private static _filters: string[];
-    private static _uniqueKeys: Key[];
-
-    static get filters(): string[] {
-        return this._filters;
-    }
-
-    static set filters(filters: string[]) {
-        this._filters = filters;
-        this.filter()
-    }
+    public static inventory: Inventory = new Inventory();
+    public static currentFilters: Filter[];
+    public static uniqueFilters: Filter[];
 
     private static filter(): void {
-        for (var i: number = 0; i < this._inventory.items.length; i++) {
-            this._inventory.matches[i] = false;
-            for (var j: number = 0; j < this._inventory.items[i].keys.length; j++) {
-                if (this._filters.length === 0) {
-                    this._inventory.matches[i] = true;
+        for (var i: number = 0; i < this.inventory.items.length; i++) {
+            this.inventory.matches[i] = false;
+            for (var j: number = 0; j < this.inventory.items[i].filters.length; j++) {
+                if (this.currentFilters.length === 0) {
+                    this.inventory.matches[i] = true;
                 } else {
-                    for (var k: number = 0; k < this._filters.length; k++) {
-                        this._inventory.matches[i] = this._inventory.matches[i] || (this._inventory.items[i].keys[j].key === this._filters[k]);
+                    for (var k: number = 0; k < this.currentFilters.length; k++) {
+                        this.inventory.matches[i] = this.inventory.matches[i] || (this.inventory.items[i].filters[j].filter === this.uniqueFilters[k].filter);
                     }
                 }
             }
         }
 
         var grey: boolean = true;
-        for (var i: number = 0; i < this._inventory.items.length; i++) {
-            if (this._inventory.matches[i]) {
-                this._inventory.greys[i] = grey;
+        for (var i: number = 0; i < this.inventory.items.length; i++) {
+            if (this.inventory.matches[i]) {
+                this.inventory.greys[i] = grey;
                 grey = !grey;
             }
         }
@@ -39,236 +30,236 @@ export class InventoryService {
 
     public static collateKeys() {
         var duplicateFound: boolean;
-        this._uniqueKeys = [];
-        for (var i: number = 0; i < this._inventory.items.length; i++) {
-            for (var j: number = 0; j < this._inventory.items[i].keys.length; j++) {
+        this.uniqueFilters = [];
+        for (var i: number = 0; i < this.inventory.items.length; i++) {
+            for (var j: number = 0; j < this.inventory.items[i].filters.length; j++) {
                 duplicateFound = false;
-                for (var k: number = 0; k < this._uniqueKeys.length; k++) {
-                    duplicateFound = this._uniqueKeys[k].key === this._inventory.items[i].keys[j].key && this._uniqueKeys[k].rank === this._inventory.items[i].keys[j].rank;
+                for (var k: number = 0; k < this.uniqueFilters.length; k++) {
+                    duplicateFound = this.uniqueFilters[k].filter === this.inventory.items[i].filters[j].filter && this.uniqueFilters[k].rank === this.inventory.items[i].filters[j].rank;
                     if (duplicateFound) {
                         break;
                     }
                 }
 
                 if (!duplicateFound) {
-                    this._uniqueKeys.push(this._inventory.items[i].keys[j]);
+                    this.uniqueFilters.push(this.inventory.items[i].filters[j]);
                 }
             }
         }
-        // this._uniqueKeys.forEach(function(value: Key) {
-        //     console.log(value.key + ',' + value.rank);
+        // this.uniqueFilters.forEach(function(value: Filter) {
+        //     console.log(value.filter + ',' + value.rank);
         // });
 
-        this._uniqueKeys.sort(function(a: Key, b: Key) {
+        this.uniqueFilters.sort(function(a: Filter, b: Filter) {
             if (a.rank < b.rank) {
                 return -1;
             }
             if (a.rank > b.rank) {
                 return 1;
             }
-            if (typeof a.key === typeof b.key) {
-                if (a.key < b.key) {
+            if (typeof a.filter === typeof b.filter) {
+                if (a.filter < b.filter) {
                     return -1;
                 }
-                if (a.key > b.key) {
+                if (a.filter > b.filter) {
                     return 1;
                 }
                 return 0;
             }
-            if (typeof a.key === 'string') {
+            if (typeof a.filter === 'string') {
                 return -1;
             }
             return 1;
         });
         // console.log('================================');
-        // this._uniqueKeys.forEach(function(value: Key) {
-        //     console.log(value.key + ',' + value.rank);
+        // this.uniqueFilters.forEach(function(value: Filter) {
+        //     console.log(value.filter + ',' + value.rank);
         // });
     }
 
     public static getInventory(): Inventory {
-        this._inventory.items = [
-            { description: "bifimbriata", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "blepharophylla", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brachypoda", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brevifolia", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brevifolia subsp. brevifolia", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brevifolia subsp. stirlingensis", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "brownii", keys: [{ key: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "acerosa", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "acerosa var. acerosa", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "acerosa var. preissii", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "aereiflora", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "albida", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "amphigia", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "apecta", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "argentea", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "attenuata", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "aurea", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "auriculata", keys: [{ key: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "capillaris", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "carinata", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "centipeda", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "chrysantha", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "chrysanthella", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "chrysostachys", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "chrysostachys var. chrysostachys", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "chrysostachys var. pallida", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "citrella", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "comosa", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "cooloomia", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "coronata", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "crebra", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "cunninghamii", keys: [{ key: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "dasystylis", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "dasystylis subsp. dasystylis", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "dasystylis subsp. kalbarriensis", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "dasystylis subsp. oestopoia", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "densiflora", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "densiflora var. cespitosa", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "densiflora var. densiflora", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "densiflora var. pedunculata", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "densiflora var. roseostella", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "densiflora var. stelluligera", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "dichroma", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "dichroma var. dichroma", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "dichroma var. syntoma", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "drummondii", keys: [{ key: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "endlicheriana", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "endlicheriana var. angustifolia", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "endlicheriana var. compacta", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "endlicheriana var. endlicheriana", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "endlicheriana var. major", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "endlicheriana var. manicula", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "eriocephala", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "etheliana", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "etheliana var. etheliana", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "etheliana var. formosa", keys: [{ key: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "fastigiata", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "fimbrilepis", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "fimbrilepis subsp. australis", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "fimbrilepis subsp. fimbrilepis", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "forrestii", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "fragrans", keys: [{ key: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "galeata", keys: [{ key: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "gracilis", keys: [{ key: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "grandiflora", keys: [{ key: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "grandis", keys: [{ key: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "habrantha", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "halophila", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "harveyi", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "helichrysantha", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "helmsii", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "huegelii", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "huegelii var. decumbens", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "huegelii var. huegelii", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "huegelii var. stylosa", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "huegelii var. tridens", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "hughanii", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "humilis", keys: [{ key: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "inclusa", keys: [{ key: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "insignis", keys: [{ key: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "insignis subsp. compta", keys: [{ key: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "insignis subsp. eomagis", keys: [{ key: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "insignis subsp. insignis", keys: [{ key: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "integra", keys: [{ key: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "interioris", keys: [{ key: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "jamiesonii", keys: [{ key: "j", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "laciniata", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "lehmannii", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "lepidophylla", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "lepidophylla var. lepidophylla", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "lepidophylla var. quantula", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "lindleyi", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "lindleyi subsp. lindleyi", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "lindleyi subsp. purpurea", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "longistylis", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "luteola", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "luteola var. luteola", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "luteola var. rosea", keys: [{ key: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "minutiflora", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "mirabilis", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "mitchelliana", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "mitchelliana subsp. implexior", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "mitchelliana subsp. mitchelliana", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "mitodes", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "monadelpha", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "monadelpha var. callitricha", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "monadelpha var. monadelpha", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "muelleriana", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "muelleriana subsp. minor", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "muelleriana subsp. muelleriana", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "multiflora", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "multiflora subsp. multiflora", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "multiflora subsp. solox", keys: [{ key: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "nitens", keys: [{ key: "n", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "nobilis", keys: [{ key: "n", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "oculata", keys: [{ key: "o", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "ovalifolia", keys: [{ key: "o", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "oxylepis", keys: [{ key: "o", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "paludosa", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "patens", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "penicillaris", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "pennigera", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "pholidophylla", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "picta", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "pityrhops", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "plumosa", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "plumosa var. ananeotes", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "plumosa var. brachyphylla", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "plumosa var. grandiflora", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "plumosa var. incrassata", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "plumosa var. plumosa", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "plumosa var. vassensis", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "polytricha", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "pritzelii", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "pulchella", keys: [{ key: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "rennieana", keys: [{ key: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "roei", keys: [{ key: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "roei subsp. meiogona", keys: [{ key: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "roei subsp. roei", keys: [{ key: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "rutilastra", keys: [{ key: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "serotina", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "serrata", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "serrata var. ciliata", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "serrata var. linearis", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "serrata var. serrata", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "serrata var. Udumung", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "setacea", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "sieberi", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "sieberi var. curta", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "sieberi var. lomata", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "sieberi var. pachyphylla", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "sieberi var. sieberi", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "spicata", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "spicata subsp. spicata", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "spicata subsp. squamosa", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "staminosa", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "staminosa var. cylindracea", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "staminosa var. erecta", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "staminosa subsp. staminosa", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "stenopetala", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "subulata", keys: [{ key: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "tumida", keys: [{ key: "t", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "tumida subsp. therogana", keys: [{ key: "t", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "tumida subsp. tumida", keys: [{ key: "t", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "venusta", keys: [{ key: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "verticillata", keys: [{ key: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "verticordina", keys: [{ key: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "vicinella", keys: [{ key: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
-            { description: "wonganensis", keys: [{ key: "w", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] }
+        this.inventory.items = [
+            { description: "bifimbriata", filters: [{ filter: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "blepharophylla", filters: [{ filter: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brachypoda", filters: [{ filter: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brevifolia", filters: [{ filter: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brevifolia subsp. brevifolia", filters: [{ filter: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brevifolia subsp. stirlingensis", filters: [{ filter: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "brownii", filters: [{ filter: "b", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "acerosa", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "acerosa var. acerosa", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "acerosa var. preissii", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "aereiflora", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "albida", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "amphigia", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "apecta", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "argentea", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "attenuata", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "aurea", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "auriculata", filters: [{ filter: "a", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "capillaris", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "carinata", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "centipeda", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "chrysantha", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "chrysanthella", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "chrysostachys", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "chrysostachys var. chrysostachys", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "chrysostachys var. pallida", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "citrella", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "comosa", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "cooloomia", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "coronata", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "crebra", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "cunninghamii", filters: [{ filter: "c", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "dasystylis", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "dasystylis subsp. dasystylis", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "dasystylis subsp. kalbarriensis", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "dasystylis subsp. oestopoia", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "densiflora", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "densiflora var. cespitosa", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "densiflora var. densiflora", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "densiflora var. pedunculata", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "densiflora var. roseostella", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "densiflora var. stelluligera", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "dichroma", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "dichroma var. dichroma", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "dichroma var. syntoma", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "drummondii", filters: [{ filter: "d", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "endlicheriana", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "endlicheriana var. angustifolia", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "endlicheriana var. compacta", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "endlicheriana var. endlicheriana", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "endlicheriana var. major", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "endlicheriana var. manicula", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "eriocephala", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "etheliana", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "etheliana var. etheliana", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "etheliana var. formosa", filters: [{ filter: "e", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "fastigiata", filters: [{ filter: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "fimbrilepis", filters: [{ filter: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "fimbrilepis subsp. australis", filters: [{ filter: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "fimbrilepis subsp. fimbrilepis", filters: [{ filter: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "forrestii", filters: [{ filter: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "fragrans", filters: [{ filter: "f", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "galeata", filters: [{ filter: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "gracilis", filters: [{ filter: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "grandiflora", filters: [{ filter: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "grandis", filters: [{ filter: "g", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "habrantha", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "halophila", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "harveyi", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "helichrysantha", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "helmsii", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "huegelii", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "huegelii var. decumbens", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "huegelii var. huegelii", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "huegelii var. stylosa", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "huegelii var. tridens", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "hughanii", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "humilis", filters: [{ filter: "h", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "inclusa", filters: [{ filter: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "insignis", filters: [{ filter: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "insignis subsp. compta", filters: [{ filter: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "insignis subsp. eomagis", filters: [{ filter: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "insignis subsp. insignis", filters: [{ filter: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "integra", filters: [{ filter: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "interioris", filters: [{ filter: "i", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "jamiesonii", filters: [{ filter: "j", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "laciniata", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "lehmannii", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "lepidophylla", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "lepidophylla var. lepidophylla", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "lepidophylla var. quantula", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "lindleyi", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "lindleyi subsp. lindleyi", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "lindleyi subsp. purpurea", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "longistylis", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "luteola", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "luteola var. luteola", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "luteola var. rosea", filters: [{ filter: "l", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "minutiflora", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "mirabilis", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "mitchelliana", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "mitchelliana subsp. implexior", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "mitchelliana subsp. mitchelliana", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "mitodes", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "monadelpha", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "monadelpha var. callitricha", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "monadelpha var. monadelpha", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "muelleriana", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "muelleriana subsp. minor", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "muelleriana subsp. muelleriana", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "multiflora", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "multiflora subsp. multiflora", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "multiflora subsp. solox", filters: [{ filter: "m", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "nitens", filters: [{ filter: "n", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "nobilis", filters: [{ filter: "n", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "oculata", filters: [{ filter: "o", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "ovalifolia", filters: [{ filter: "o", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "oxylepis", filters: [{ filter: "o", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "paludosa", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "patens", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "penicillaris", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "pennigera", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "pholidophylla", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "picta", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "pityrhops", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "plumosa", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "plumosa var. ananeotes", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "plumosa var. brachyphylla", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "plumosa var. grandiflora", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "plumosa var. incrassata", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "plumosa var. plumosa", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "plumosa var. vassensis", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "polytricha", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "pritzelii", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "pulchella", filters: [{ filter: "p", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "rennieana", filters: [{ filter: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "roei", filters: [{ filter: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "roei subsp. meiogona", filters: [{ filter: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "roei subsp. roei", filters: [{ filter: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "rutilastra", filters: [{ filter: "r", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "serotina", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "serrata", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "serrata var. ciliata", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "serrata var. linearis", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "serrata var. serrata", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "serrata var. Udumung", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "setacea", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "sieberi", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "sieberi var. curta", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "sieberi var. lomata", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "sieberi var. pachyphylla", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "sieberi var. sieberi", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "spicata", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "spicata subsp. spicata", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "spicata subsp. squamosa", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "staminosa", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "staminosa var. cylindracea", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "staminosa var. erecta", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "staminosa subsp. staminosa", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "stenopetala", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "subulata", filters: [{ filter: "s", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "tumida", filters: [{ filter: "t", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "tumida subsp. therogana", filters: [{ filter: "t", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "tumida subsp. tumida", filters: [{ filter: "t", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "venusta", filters: [{ filter: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "verticillata", filters: [{ filter: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "verticordina", filters: [{ filter: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "vicinella", filters: [{ filter: "v", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] },
+            { description: "wonganensis", filters: [{ filter: "w", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] }
         ];
 
-        for (var i: number = 0; i < this._inventory.items.length; i++) {
-            this._inventory.matches.push(true);
-            this._inventory.greys.push(i % 2 === 0);
+        for (var i: number = 0; i < this.inventory.items.length; i++) {
+            this.inventory.matches.push(true);
+            this.inventory.greys.push(i % 2 === 0);
         };
-
-        this.filters = ['s', 'a', 'f'];
-        // this.filters = [];
         
         this.collateKeys();
 
-        return this._inventory;
+        this.currentFilters = [{ filter: "s", rank: 0 }, { filter: "a", rank: 0 }, { filter: "b", rank: 0 }, { filter: "f", rank: 0 }];
+        this.filter()
+
+        return this.inventory;
     }
 }

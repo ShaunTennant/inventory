@@ -6,12 +6,12 @@ export class Inventory {
 
 export class InventoryItem {
 	description: string | number;
-	keys: Key[];
+	filters: Filter[];
 	counts: Count[];
 }
 
-export class Key {
-	key: string | number;
+export class Filter {
+	filter: string | number;
 	rank: number;
 }
 export class Count {

@@ -1,8 +1,8 @@
 import { bootstrap, Component, View, NgFor, Pipe, PipeTransform } from 'angular2/angular2';
 
-import { InventoryTableComponent } from '../inventorytable/inventorytable.component'
-import { Inventory, InventoryItem, Key } from '../inventoryshared/inventorytable.class'
+import { Inventory, InventoryItem, Filter, Count } from '../inventoryshared/inventorytable.class'
 import { InventoryService } from '../inventoryshared/inventory.service'
+import { InventoryTableComponent } from '../inventorytable/inventorytable.component'
 
 @Component({
 	selector: 'inventoryroot',
