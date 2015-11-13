@@ -2,25 +2,25 @@ import { Inventory, InventoryItem, Filter, Amount } from '../inventoryshared/inv
 
 export class InventoryService {
     public static inventory: Inventory = new Inventory();
-    public static currentFilters: Filter[];
-    public static uniqueFilters: Filter[];
+    public static currentFilters: Filter[] = [];
+    public static uniqueFilters: Filter[] = [];
 
     private static filter(): void {
-        for (var i: number = 0; i < this.inventory.items.length; i++) {
+        for (let i: number = 0; i < this.inventory.items.length; i++) {
             this.inventory.matches[i] = false;
-            for (var j: number = 0; j < this.inventory.items[i].filters.length; j++) {
+            for (let j: number = 0; j < this.inventory.items[i].filters.length; j++) {
                 if (this.currentFilters.length === 0) {
                     this.inventory.matches[i] = true;
                 } else {
-                    for (var k: number = 0; k < this.currentFilters.length; k++) {
+                    for (let k: number = 0; k < this.currentFilters.length; k++) {
                         this.inventory.matches[i] = this.inventory.matches[i] || (this.inventory.items[i].filters[j].value === this.currentFilters[k].value);
                     }
                 }
             }
         }
 
-        var grey: boolean = true;
-        for (var i: number = 0; i < this.inventory.items.length; i++) {
+        let grey: boolean = true;
+        for (let i: number = 0; i < this.inventory.items.length; i++) {
             if (this.inventory.matches[i]) {
                 this.inventory.greys[i] = grey;
                 grey = !grey;
@@ -28,13 +28,13 @@ export class InventoryService {
         }
     }
 
-    public static collateKeys() {
-        var duplicateFound: boolean;
+    private static collateKeys() {
+        let duplicateFound: boolean;
         this.uniqueFilters = [];
-        for (var i: number = 0; i < this.inventory.items.length; i++) {
-            for (var j: number = 0; j < this.inventory.items[i].filters.length; j++) {
+        for (let i: number = 0; i < this.inventory.items.length; i++) {
+            for (let j: number = 0; j < this.inventory.items[i].filters.length; j++) {
                 duplicateFound = false;
-                for (var k: number = 0; k < this.uniqueFilters.length; k++) {
+                for (let k: number = 0; k < this.uniqueFilters.length; k++) {
                     duplicateFound = this.uniqueFilters[k].value === this.inventory.items[i].filters[j].value && this.uniqueFilters[k].rank === this.inventory.items[i].filters[j].rank;
                     if (duplicateFound) {
                         break;
@@ -77,7 +77,7 @@ export class InventoryService {
         // });
     }
 
-    public static getInventory(): Inventory {
+    public static loadInventory(): void {
         this.inventory.items = [
             { description: "bifimbriata", filters: [{ value: "b", rank: 0 }], amounts: [{ description: "200mm", value: 0 }, { description: "70mm", value: 0 }, { description: "50mm", value: 0 }, ] },
             { description: "blepharophylla", filters: [{ value: "b", rank: 0 }], amounts: [{ description: "200mm", value: 0 }, { description: "70mm", value: 0 }, { description: "50mm", value: 0 }, ] },
@@ -266,17 +266,15 @@ export class InventoryService {
             }
         });
 
-        for (var i: number = 0; i < this.inventory.items.length; i++) {
+        for (let i: number = 0; i < this.inventory.items.length; i++) {
             this.inventory.matches.push(true);
             this.inventory.greys.push(i % 2 === 0);
         };
-        
+
         this.collateKeys();
 
         this.currentFilters = [{ value: "s", rank: 0 }, { value: "a", rank: 0 }, { value: "b", rank: 0 }];
         // this.currentFilters = [{ value: "f", rank: 0 }];
         this.filter()
-
-        return this.inventory;
     }
 }
