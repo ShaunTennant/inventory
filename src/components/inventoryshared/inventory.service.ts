@@ -1,9 +1,13 @@
-import { Inventory, Key } from '../inventoryshared/inventorytable.class'
+import { Inventory, InventoryItem, Key, Count, Test } from '../inventoryshared/inventorytable.class'
 
 export class InventoryService {
     public static inventory: Inventory = new Inventory();
-    public static selectedKeys: Key[];
-    public static uniqueKeys: Key[];
+    public static selectedKeys: Key[] = [];
+    public static uniqueKeys: Test = new Test();
+
+    public static uniqueKeysGet(): Test {
+        return this.uniqueKeys;
+    }
 
     private static filter(): void {
         for (var i: number = 0; i < this.inventory.items.length; i++) {
@@ -33,24 +37,24 @@ export class InventoryService {
 
     public static uniqueKeysCalculate() {
         var duplicateFound: boolean;
-        this.uniqueKeys = [];
+        this.uniqueKeys.keys = [];
         for (var i: number = 0; i < this.inventory.items.length; i++) {
             for (var j: number = 0; j < this.inventory.items[i].keys.length; j++) {
                 duplicateFound = false;
-                for (var k: number = 0; k < this.uniqueKeys.length; k++) {
-                    duplicateFound = this.uniqueKeys[k].key === this.inventory.items[i].keys[j].key && this.uniqueKeys[k].rank === this.inventory.items[i].keys[j].rank;
+                for (var k: number = 0; k < this.uniqueKeys.keys.length; k++) {
+                    duplicateFound = this.uniqueKeys.keys[k].key === this.inventory.items[i].keys[j].key && this.uniqueKeys.keys[k].rank === this.inventory.items[i].keys[j].rank;
                     if (duplicateFound) {
                         break;
                     }
                 }
 
                 if (!duplicateFound) {
-                    this.uniqueKeys.push(this.inventory.items[i].keys[j]);
+                    this.uniqueKeys.keys.push(this.inventory.items[i].keys[j]);
                 }
             }
         }
 
-        this.uniqueKeys.sort(function(a: Key, b: Key) {
+        this.uniqueKeys.keys.sort(function(a: Key, b: Key) {
             if (a.rank < b.rank) {
                 return -1;
             }
@@ -72,7 +76,7 @@ export class InventoryService {
             return 1;
         });
         // console.log('================================');
-        // this.uniqueKeys.forEach(function(value: Key) {
+        // this.uniqueKeys.keys.forEach(function(value: Key) {
         //     console.log(value.key + ',' + value.rank);
         // });
     }
@@ -250,14 +254,30 @@ export class InventoryService {
             { description: "wonganensis", keys: [{ key: "w", rank: 0 }], counts: [{ size: "200mm", count: 0 }, { size: "70mm", count: 0 }, { size: "50mm", count: 0 }, ] }
         ];
 
+        this.inventory.items.sort(function(a: InventoryItem, b: InventoryItem) {
+            if (typeof a.description === typeof b.description) {
+                if (a.description === b.description) {
+                    return 0;
+                } else if (a.description > b.description) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            } else if (typeof a.description === "number") {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+
         for (var i: number = 0; i < this.inventory.items.length; i++) {
             this.inventory.matches.push(true);
             this.inventory.greys.push(i % 2 === 0);
         };
 
         this.uniqueKeysCalculate();
-        this.selectedKeys = [{ key: "s", rank: 0 }, { key: "a", rank: 1 }, { key: "f", rank: 0 } ]
-        this.filter()
+        this.selectedKeys = [{ key: "s", rank: 0 }, { key: "a", rank: 0 }, { key: "b", rank: 0 }, { key: "f", rank: 0 }];
+        this.filter();
 
         return this.inventory;
     }

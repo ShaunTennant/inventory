@@ -18,3 +18,7 @@ export class Count {
 	size: string;
 	count: number;
 }
+
+export class Test {
+	keys: Key[];
+}

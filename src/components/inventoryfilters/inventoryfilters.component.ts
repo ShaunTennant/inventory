@@ -1,12 +1,12 @@
 import { Component, View, NgFor, NgClass } from 'angular2/angular2';
-// import { InventoryItem } from '../inventoryshared/inventorytable.class'
+import { Inventory, InventoryItem, Key, Count } from '../inventoryshared/inventorytable.class'
 
 @Component({
-	selector: 'inventoryfilter',
+	selector: 'inventoryfilters',
 	templateUrl: './components/inventoryfilters/inventoryfilters.html',
 	styleUrls: ['./components/inventoryfilters/inventoryfilters.css'],
 	directives: [NgFor, NgClass],
-	inputs: ['filters']
+	inputs: ['bbbb']
 })
-export class InventoryFilterComponent {
+export class InventoryFiltersComponent {
 }
