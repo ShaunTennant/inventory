@@ -15,6 +15,6 @@ export class Filter {
 	rank: number;
 }
 export class Amount {
-	size: string;
+	description: string;
 	value: number;
 }
