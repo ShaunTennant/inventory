@@ -2,18 +2,18 @@ import { Inventory, InventoryItem, Filter, Amount } from '../inventoryshared/inv
 
 export class InventoryService {
     public static inventory: Inventory = new Inventory();
-    public static currentFilters: Filter[] = [];
+    public static activeFilters: Filter[] = [];
     public static uniqueFilters: Filter[] = [];
 
     private static filter(): void {
         for (let i: number = 0; i < this.inventory.items.length; i++) {
             this.inventory.matches[i] = false;
             for (let j: number = 0; j < this.inventory.items[i].filters.length; j++) {
-                if (this.currentFilters.length === 0) {
+                if (this.activeFilters.length === 0) {
                     this.inventory.matches[i] = true;
                 } else {
-                    for (let k: number = 0; k < this.currentFilters.length; k++) {
-                        this.inventory.matches[i] = this.inventory.matches[i] || (this.inventory.items[i].filters[j].value === this.currentFilters[k].value);
+                    for (let k: number = 0; k < this.activeFilters.length; k++) {
+                        this.inventory.matches[i] = this.inventory.matches[i] || (this.inventory.items[i].filters[j].value === this.activeFilters[k].value);
                     }
                 }
             }
@@ -273,7 +273,7 @@ export class InventoryService {
 
         this.collateKeys();
 
-        this.currentFilters = [{ value: "s", rank: 0 }, { value: "a", rank: 0 }, { value: "b", rank: 0 }];
+        // this.activeFilters = [{ value: "s", rank: 0 }, { value: "a", rank: 0 }, { value: "b", rank: 0 }];
         // this.currentFilters = [{ value: "f", rank: 0 }];
         this.filter()
     }

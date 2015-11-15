@@ -1,1 +1,11 @@
-<span *ng-for="#filter of uniqueFilters">{{filter.value}}</span>
+<div>
+	<span *ng-for="#filter of uniqueFilters"
+    (click)="filterClick(filter)"
+    [ng-class]="{
+        isActive: activeFilters.indexOf(filter) !== -1,
+        isMouseover: filter === mouseoverFilter && activeFilters.indexOf(filter) === -1,
+        isActiveMouseover: filter === mouseoverFilter && activeFilters.indexOf(filter) !== -1 }"
+        (mouseenter)="filterMouseenter(filter)"
+        (mouseleave)="filterMouseleave()"
+    >{{filter.value}}</span>
+</div>
