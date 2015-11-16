@@ -3,40 +3,49 @@ import { Inventory, InventoryItem, Filter, Amount } from '../inventoryshared/inv
 import { InventoryService } from '../inventoryshared/inventory.service'
 
 @Component({
-	selector: 'inventoryfilters',
-	templateUrl: './components/inventoryfilters/inventoryfilters.html',
-	styleUrls: ['./components/inventoryfilters/inventoryfilters.css'],
-	directives: [NgFor]
+    selector: 'inventoryfilters',
+    templateUrl: './components/inventoryfilters/inventoryfilters.html',
+    styleUrls: ['./components/inventoryfilters/inventoryfilters.css'],
+    directives: [NgFor]
 })
 export class InventoryFilters {
-	private uniqueFilters: Filter[] = InventoryService.uniqueFilters;
-	private activeFilters: Filter[] = InventoryService.activeFilters;
-	private mouseoverFilter: Filter;
+    private uniqueFilters: Filter[] = InventoryService.uniqueFilters;
+    private activeFilters: Filter[] = InventoryService.activeFilters;
+    private mouseoverFilter: Filter;
 
-	filterClick(filter: Filter) {
-		let index: number = this.activeFilters.indexOf(filter);
-		if (index === -1) {
-			this.activeFilters.push(filter);
-		} else {
-			this.activeFilters.splice(index, 1);
-		}
-		// let active: string = "";
+    filterClick(filter: Filter) {
+        // let index: number = this.activeFilters.indexOf(filter);
+        // if (index === -1) {
+        // 	this.activeFilters.push(filter);
+        // } else {
+        // 	this.activeFilters.splice(index, 1);
+        // }
+        
+        if (this.activeFilters.length > 0 && this.activeFilters[0] === filter) {
+            InventoryService.activeFilters = [];
+        } else {
+            InventoryService.activeFilters = [filter];
+        }
+        this.activeFilters = InventoryService.activeFilters;
+        InventoryService.filter();
+        
+        // let active: string = "";
         // this.activeFilters.forEach(function(filter: Filter) {
         //     active += filter.value + ',' + filter.rank + "|";
         // });
-		// console.log(active);
-		// let inventoryServiceActive: string = "";
+        // console.log(active);
+        // let inventoryServiceActive: string = "";
         // InventoryService.activeFilters.forEach(function(filter: Filter) {
         //     inventoryServiceActive += filter.value + ',' + filter.rank + "|";
         // });
-		// console.log(inventoryServiceActive);
-	}
-	
-	filterMouseenter(filter: Filter) {
-		this.mouseoverFilter = filter;
-	}
+        // console.log(inventoryServiceActive);
+    }
 
-	filterMouseleave() {
-		this.mouseoverFilter = null;
-	}
+    filterMouseenter(filter: Filter) {
+        this.mouseoverFilter = filter;
+    }
+
+    filterMouseleave() {
+        this.mouseoverFilter = null;
+    }
 }

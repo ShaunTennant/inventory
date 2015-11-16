@@ -5,7 +5,7 @@ export class InventoryService {
     public static activeFilters: Filter[] = [];
     public static uniqueFilters: Filter[] = [];
 
-    private static filter(): void {
+    public static filter(): void {
         for (let i: number = 0; i < this.inventory.items.length; i++) {
             this.inventory.matches[i] = false;
             for (let j: number = 0; j < this.inventory.items[i].filters.length; j++) {
