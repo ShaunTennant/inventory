@@ -12,7 +12,6 @@ import { InventoryFilters } from '../inventoryfilters/inventoryfilters.component
 	providers: [InventoryService]
 })
 export class InventoryRoot {
-	// private inventory: Inventory;
 
 	constructor(inventoryService: InventoryService) {
 		InventoryService.loadInventory();

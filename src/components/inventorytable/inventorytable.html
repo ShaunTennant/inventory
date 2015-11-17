@@ -1,14 +1,14 @@
 <table [ng-class]="">
-	<thead>
-		<tr>
-			<th>Description</th>
-			<th *ng-for="#amount of inventory.items[0].amounts">{{amount.description}}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr *ng-for="#item of inventory.items; #index = index" [hidden]="!inventory.matches[index]" [ng-class]="{ grey: inventory.greys[index] }">
-			<td>{{item.description}}</td>
-			<td *ng-for="#amount of item.amounts">{{amount.value}}</td>
-		</tr>
-	</tbody>
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th *ng-for="#amount of inventory.items[0].amounts">{{amount.description}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ng-for="#item of inventory.items; #index = index" [hidden]="!inventory.matches[index]" [ng-class]="{ grey: inventory.greys[index] }">
+            <td>{{item.description}}</td>
+            <td *ng-for="#amount of item.amounts">{{amount.value}}</td>
+        </tr>
+    </tbody>
 </table>
